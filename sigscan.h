@@ -6,5 +6,5 @@ typedef struct {
 	unsigned char high:4;
 } byte;
 
-// not really proud of this declaration
+// not my proudest function declaration
 void *NibbleSigScan(void *start, size_t range, char *sig, size_t sig_len, char *mask, size_t mask_len);
