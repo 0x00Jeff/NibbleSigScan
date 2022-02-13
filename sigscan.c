@@ -45,7 +45,9 @@ void *NibbleSigScan(void *start, size_t range, char *sig, size_t sig_len, char *
 				if(sig_ptr[i].low != ptr[i].low)
 						break;
 
-			}else{
+			}else if(c == '?'){
+				continue;
+			} else{
 				fprintf(stderr, "unknown mask character : %c\n", c);
 				return NULL;
 			}
