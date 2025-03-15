@@ -3,7 +3,8 @@
 #include<stdint.h>
 #include <stddef.h>
 
-#define NIBBLE_VALUES 16
+// There are 16 possible values for a nibble
+#define NIBBLE_VALUES 16 
 
 void *NibbleSigScan(void *start, size_t range, unsigned char *pattern, size_t pattern_len, char *mask) {
     if (!start || !pattern || !mask || pattern_len == 0) return NULL;
