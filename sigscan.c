@@ -1,7 +1,8 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdint.h>
-#include <stddef.h>
+#include<stddef.h>
+#include"sigscan.h"
 
 // There are 16 possible values for a nibble
 #define NIBBLE_VALUES 16 
