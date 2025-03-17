@@ -14,7 +14,7 @@ int main(void){
 	// this is the equivalent of {0x6?, 0x?8} sig
 	char *mask = "ll?x";
 
-	void *found = NibbleSigScan(arr, sizeof(arr), sig, sizeof(sig), mask, strlen(mask));
+	void *found = NibbleSigScan(arr, sizeof(arr), sig, sizeof(sig), mask);
 	if(!found){
 		fprintf(stderr, "couldn't find signature\n");
 		return -1;

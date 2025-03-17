@@ -1,64 +1,47 @@
 #include<stdio.h>
 #include<string.h>
+#include<stdint.h>
+#include<stddef.h>
 #include"sigscan.h"
 
-void *NibbleSigScan(void *start, size_t range, char *sig, size_t sig_len, char *mask, size_t mask_len){
+// There are 16 possible values for a nibble
+#define NIBBLE_VALUES 16 
 
-	if(!start || !sig || !mask)
-		return NULL;
+void *NibbleSigScan(void *start, size_t range, unsigned char *pattern, size_t pattern_len, char *mask) {
+    if (!start || !pattern || !mask || pattern_len == 0) return NULL;
 
-	if(mask_len != sig_len ){
-		fprintf(stderr, "NibbleSigScan : mask length mismatch\n");
-		return NULL;
-	}
+    unsigned char *text = (unsigned char *)start;
+    size_t shift_table[NIBBLE_VALUES];
 
-	byte *ptr = (byte *)start;
-	byte *end_ptr = ptr + range;
+    // Initialize shift table
+    for (size_t i = 0; i < NIBBLE_VALUES; i++) {
+        shift_table[i] = pattern_len;
+    }
 
-	byte *sig_ptr = (byte *)sig;
+    // Populate shift table
+    for (size_t i = 0; i < pattern_len - 1; i++) {
+        unsigned char nibble = (pattern[i] & 0x0F); // Considering low nibble for shift
+        shift_table[nibble] = pattern_len - i - 1;
+    }
 
-	// sig/ptr index
-	size_t i;
+    size_t index = 0;
+    while (index <= range - pattern_len) {
+        ssize_t i = pattern_len - 1;
+        while (i >= 0) {
+            unsigned char text_nibble = text[index + i] & 0x0F; // Low nibble
+            unsigned char pattern_nibble = pattern[i] & 0x0F;
 
-	// current mask character
-	char c;
+            if (mask[i] == 'x' && text[index + i] != pattern[i]) break;
+            if (mask[i] == 'h' && (text[index + i] & 0xF0) != (pattern[i] & 0xF0)) break;
+            if (mask[i] == 'l' && text_nibble != pattern_nibble) break;
 
-	//  check a nibble at a time
-	while(ptr + sig_len <= end_ptr){
-		for(i = 0; i < sig_len;i++){
+            i--;
+        }
+        if (i < 0) return &text[index]; // Match found
 
-			c = mask[i];
+        unsigned char next_nibble = text[index + pattern_len - 1] & 0x0F;
+        index += shift_table[next_nibble];
+    }
 
-			// both nibbles have to match
-			if(c == 'x'){
-				if(sig_ptr[i].high != ptr[i].high
-						|| sig_ptr[i].low != ptr[i].low)
-					break;
-
-			// only the high nibble has to match
-			}else if(c == 'h'){
-				if(sig_ptr[i].high != ptr[i].high)
-						break;
-
-			// only the lower nibble has to match
-			} else if(c == 'l'){
-				if(sig_ptr[i].low != ptr[i].low)
-						break;
-
-			}else if(c == '?'){
-				continue;
-			} else{
-				fprintf(stderr, "unknown mask character : %c\n", c);
-				return NULL;
-			}
-		}
-
-		if(i == sig_len)
-			return ptr;
-
-		ptr++;
-
-	}
-
-	return NULL;
+    return NULL; // No match found
 }

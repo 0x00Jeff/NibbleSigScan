@@ -28,7 +28,7 @@ int main(void){
 	// this is the equivalent of {0x?5, 0x4?, ??, 0x73} pattern
 	char *mask = "ll?x";
 
-	void *found = NibbleSigScan(arr, sizeof(arr), sig, sizeof(sig), mask, strlen(mask));
+	void *found = NibbleSigScan(arr, sizeof(arr), sig, sizeof(sig), mask);
 	if(!found){
 		fprintf(stderr, "couldn't find signature\n");
 		return -1;
